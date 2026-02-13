@@ -1,4 +1,4 @@
-﻿# Core app
+# Core app
 streamlit
 streamlit-float
 PyMuPDF
@@ -31,3 +31,4 @@ PyYAML
 tiktoken
 streamlit-chat-widget
 ./Chat_input_widget-master
+google-generativeai
