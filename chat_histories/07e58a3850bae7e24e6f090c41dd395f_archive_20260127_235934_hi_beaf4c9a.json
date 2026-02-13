@@ -1,0 +1,19 @@
+{
+  "user_email": "aapkumarasiri99@gmail.com",
+  "timestamp": "2026-01-27T23:59:34.204055",
+  "title": "hi",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hi"
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I'm the Wetland Conservation Policy Assistant (WCPA), your expert resource for wetland conservation, environmental policies, and sustainable ecosystem management.\n\nI can help you with questions about:\n- Wetland protection and management policies\n- Environmental regulations and governance\n- Biodiversity conservation strategies\n- Land use planning and natural resource management\n- Climate change adaptation and disaster risk reduction\n- And related environmental policy areas\n\nWhat specific question can I help you with today? For example, you might ask about wetland conservation regulations, protected area management, or environmental compliance requirements.",
+      "references": [],
+      "msg_id": "msg-1"
+    }
+  ],
+  "total_queries": 1,
+  "model": "DeepSeek"
+}

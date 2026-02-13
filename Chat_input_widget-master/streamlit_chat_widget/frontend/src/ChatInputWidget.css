@@ -1,0 +1,478 @@
+/* Reset and base styles */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: transparent !important;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+/* Main chat bar container */
+.chat-bar-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #F0FDFA 0%, #ECFDF5 50%); /* light teal background to match app */
+  border-radius: 28px; /* squircle shape */
+  padding: 10px 14px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06), 0 16px 48px rgba(6, 182, 212, 0.08);
+  border: 1px solid rgba(6, 182, 212, 0.10);
+  z-index: 30;
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  background: rgba(240, 253, 250, 0.95); /* lightly opaque to improve contrast */
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  position: relative;
+  transition: box-shadow 200ms ease, border 200ms ease;
+}
+
+/* Left action buttons group */
+.left-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* Right action buttons group */
+.right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+/* Generic action button */
+.action-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #0F766E; /* primary teal */
+  transition: background-color 0.2s ease, color 0.2s ease;
+  padding: 0;
+}
+
+.action-btn:hover {
+  background-color: rgba(6, 182, 212, 0.07); /* subtle cyan hover */
+}
+
+.action-btn:active {
+  background-color: rgba(15, 118, 110, 0.08);
+}
+
+.action-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Mic button specific styles */
+.mic-btn.recording {
+  color: #dc2626;
+  background-color: #fef2f2;
+}
+
+.mic-btn.recording:hover {
+  background-color: #fee2e2;
+}
+
+/* Send button - circular with background */
+.send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  background: #E6FFFA; /* light cyan */
+  border-radius: 50%;
+  cursor: not-allowed;
+  color: #94A3B8;
+  transition: all 0.2s ease;
+  padding: 0;
+}
+
+.send-btn.active {
+  background: #06B6D4; /* cyan accent for active send */
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.send-btn.active:hover {
+  background: #0e9aa4; /* darker cyan on hover */
+}
+
+.send-btn.active:active {
+  transform: scale(0.95);
+}
+
+.send-btn svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Chat input field */
+.chat-input-field {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #1f2937;
+  background: transparent;
+  padding: 8px 12px;
+  min-width: 0;
+  border-radius: 20px;
+}
+
+.dark-mode .chat-input-field {
+  color: #f1f5f9;
+}
+
+.chat-input-field::placeholder {
+  color: #9ca3af;
+}
+
+.dark-mode .chat-input-field::placeholder {
+  color: #64748b;
+}
+
+.chat-input-field:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Hide default focus when activated by mouse (keeps accessibility for keyboard) */
+.chat-bar-container:focus-within {
+  /* box-shadow: 0 14px 48px rgba(6, 182, 212, 0.16), 0 4px 18px rgba(0, 0, 0, 0.08); */
+  box-shadow: none;
+  border: 1px solid rgba(6, 182, 212, 0.22);
+}
+
+/* Show visible ring only for keyboard focus */
+.chat-input-field:focus-visible {
+    outline: 2px solid rgba(15,118,110,0.12);
+    box-shadow: 0 0 0 4px rgba(15,118,110,0.06);
+    border-radius: 12px;
+}
+
+/* Recording indicator */
+.recording-indicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  background: #fef2f2;
+  border-radius: 20px;
+  flex-shrink: 0;
+}
+
+.recording-dot {
+  width: 8px;
+  height: 8px;
+  background: #dc2626;
+  border-radius: 50%;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.recording-text {
+  font-size: 12px;
+  color: #dc2626;
+  font-weight: 500;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .chat-bar-container {
+    padding: 6px 10px;
+    gap: 4px;
+  }
+
+  .left-actions {
+    gap: 2px;
+  }
+
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+
+  .action-btn svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .chat-input-field {
+    font-size: 14px;
+    padding: 6px 8px;
+  }
+
+  .recording-indicator {
+    padding: 3px 8px;
+  }
+
+  .recording-text {
+    font-size: 11px;
+  }
+}
+
+/* Remove mouse-click black focus ring – keep keyboard focus ring for accessibility */
+button,
+input,
+textarea,
+a,
+.icon-button,
+.mic-button,
+.react-mic {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide focus outline for mouse click / pointer; keep keyboard focus visible (focus-visible) */
+button:focus:not(:focus-visible),
+input:focus:not(:focus-visible),
+textarea:focus:not(:focus-visible),
+a:focus:not(:focus-visible),
+.icon-button:focus:not(:focus-visible),
+.mic-button:focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+/* Subtle visible focus for keyboard users */
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+a:focus-visible,
+.icon-button:focus-visible,
+.mic-button:focus-visible {
+    outline: 2px solid rgba(15,118,110,0.12);
+    box-shadow: 0 0 0 4px rgba(15,118,110,0.06);
+}
+
+/* left-actions is already defined; ensure relative positioning for the popover */
+.left-actions {
+  position: relative;
+}
+
+/* Popover - positioned to the right of the filter button, inside the chat bar */
+.filter-popover {
+  position: absolute;
+  min-width: 220px;
+  max-width: 360px;
+  width: auto;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(248, 255, 253, 0.98));
+  border: 1px solid rgba(6, 182, 212, 0.10);
+  box-shadow: 0 10px 26px rgba(6, 182, 212, 0.08), 0 4px 10px rgba(0,0,0,0.06);
+  padding: 10px 12px;
+  z-index: 9999;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+/* small arrow pointing down (popper above anchor) */
+.filter-popover::after { display: none; }
+.filter-popover--above::after {
+  content: "";
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 8px solid #ffffff;
+  filter: drop-shadow(0 -1px 2px rgba(0,0,0,0.06));
+}
+.filter-popover--below::after {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 8px solid #ffffff;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.06));
+}
+
+/* decorative squircle to the left */
+.filter-left-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: linear-gradient(135deg, #06B6D4, #0F766E);
+  flex-shrink: 0;
+  display: inline-block;
+  margin-top: 6px;
+}
+
+/* form */
+.filter-form {
+  width: 100%;
+}
+
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: #0F172A;
+}
+.filter-row input {
+  width: 100%;
+  height: 32px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 118, 110, 0.06);
+  padding: 6px 8px;
+  font-size: 13px;
+  background: #fff;
+  color: #0F172A;
+}
+
+/* actions */
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+.filter-apply, .filter-cancel {
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 13px;
+}
+.filter-apply {
+  background: linear-gradient(135deg, #06B6D4 0%, #0E9AA4 100%);
+  color: white;
+}
+.filter-cancel {
+  background: transparent;
+  color: #0F172A;
+  border: 1px solid #E8F8F6;
+}
+
+/* subtle open state on icon button */
+.filter-btn.open {
+  background-color: rgba(6, 182, 212, 0.10);
+  color: #04748d;
+}
+
+/* pop animation */
+@keyframes fadePop {
+  0% { opacity: 0; transform: translateY(6px) scale(.98); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .filter-popover { left: 4px; width: 220px; }
+  .filter-squircle { width: 40px; height: 40px; }
+  .filter-row input { height: 30px; font-size: 12px; }
+}
+
+/* When filter is open keep it flush to the right on small screens */
+@media (max-width: 480px) {
+  .filter-popover { left: 100%; top: auto; bottom: 44px; transform: translateX(-8px) translateY(0); width: 220px; }
+}
+
+/* Right side filter drawer and overlay */
+.filter-drawer-wrapper { position: fixed; inset: 0; z-index: 9999; pointer-events: none; }
+.filter-drawer-wrapper .drawer-overlay { position: fixed; inset: 0; background: rgba(7, 16, 22, 0.48); opacity: 0; transition: opacity 160ms ease; pointer-events: none; }
+.filter-drawer-wrapper .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.filter-drawer { position: fixed; right: 0; top: 0; bottom: 0; width: 320px; max-width: 90vw; background: linear-gradient(180deg,#ffffff,#f8fffd); border-left: 1px solid rgba(6,182,212,0.06); box-shadow: -18px 0 36px rgba(6,182,212,0.12); transform: translateX(100%); transition: transform 220ms cubic-bezier(.2,.9,.3,1); pointer-events: auto; display: flex; flex-direction: column; }
+.filter-drawer.open { transform: translateX(0); }
+.filter-drawer-header { display:flex; align-items:center; justify-content:space-between; gap:12px; padding: 16px 18px; border-bottom: 1px solid rgba(6,182,212,0.04); }
+.filter-drawer-header h3 { margin:0; font-size:16px; color: #0F172A; }
+.filter-close { border:none; background:transparent; color: #0F172A; cursor:pointer; font-size:18px; }
+.filter-close:hover { color: #06B6D4; }
+.filter-drawer-body { padding: 12px 18px 20px 18px; overflow:auto; flex: 1 1 auto; }
+.filter-drawer-footer { padding: 12px 18px; border-top: 1px solid rgba(6,182,212,0.03); display:flex; gap:8px; justify-content:flex-end; }
+.filter-drawer .filter-row { margin-bottom: 12px; }
+
+@media (max-width: 640px) {
+  .filter-drawer { width: 92vw; }
+  .filter-drawer.open { transform: translateX(0); }
+}
+
+/* Suggestion chips */
+.chat-widget-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.suggestion-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  justify-content: center;
+}
+
+.suggestion-chip {
+  padding: 8px 14px;
+  border-radius: 18px;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #334155;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 150ms ease;
+  white-space: nowrap;
+}
+
+.suggestion-chip:hover {
+  background: #f1f5f9;
+  border-color: #0891b2;
+  color: #0891b2;
+}
+
+.suggestion-chips.dark .suggestion-chip {
+  background: #334155;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.suggestion-chips.dark .suggestion-chip:hover {
+  background: #475569;
+  border-color: #14b8a6;
+  color: #14b8a6;
+}
+
+@media (max-width: 600px) {
+  .suggestion-chip {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}

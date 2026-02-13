@@ -1,0 +1,133 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# macOS hidden files
+.DS_Store
+
+# Virtual environments
+env/
+venv/
+.venv/
+ENV/
+.ENV/
+
+# VS Code workspace settings
+.vscode/
+*.code-workspace
+
+# Pyre type checker
+.pyre/
+
+# MyPy type checker
+.mypy_cache/
+.dmypy.json
+
+# Pytest
+.pytest_cache/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Coverage reports
+htmlcov/
+.tox/
+.nox/
+coverage.*
+*.cover
+.hypothesis/
+*.py,cover
+.cache
+nosetests.xml
+coverage.xml
+*.log
+
+# pytest
+.pytest_cache/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Pydantic cache
+.pdm/
+
+# Sphinx documentation
+docs/_build/
+
+# PyInstaller
+*.manifest
+*.spec
+dist/
+*.egg-info/
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.nox/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+
+# Environments
+.env
+.env.*
+
+# Jupyter Notebook files
+.ipynb_checkpoints
+
+# macOS specific files
+.DS_Store
+
+# Pyre type checker
+.pyre/
+
+# Node and npm related
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Webpack and build folders
+frontend/dist/
+frontend/.cache/
+
+# Ignore frontend environment files
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# Ignore coverage results
+frontend/coverage/
+
+# Ignore lint and formatter files
+.eslintcache
+prettier.config.js
+.prettierignore
+
+# Log files
+*.log
+*.log.*
+
+# Miscellaneous
+*.swp
+*~
+.project
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Pycharm
+.idea/

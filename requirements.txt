@@ -1,0 +1,33 @@
+﻿# Core app
+streamlit
+streamlit-float
+PyMuPDF
+python-dotenv
+requests
+pandas
+numpy
+
+# LangChain ecosystem
+langchain==0.3.26
+langchain-community==0.3.27
+langchain-core==0.3.79
+openai
+tiktoken
+faiss-cpu
+sentence-transformers
+rank-bm25
+fpdf
+# ML + Transformers
+torch
+torchvision
+torchaudio
+transformers
+scikit-learn
+
+# Utilities
+tenacity
+python-dateutil
+PyYAML
+tiktoken
+streamlit-chat-widget
+./Chat_input_widget-master

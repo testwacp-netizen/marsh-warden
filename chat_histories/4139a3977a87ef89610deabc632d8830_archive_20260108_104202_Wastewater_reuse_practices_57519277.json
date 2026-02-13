@@ -1,0 +1,81 @@
+{
+  "user_email": "totallygeneric9@gmail.com",
+  "timestamp": "2026-01-08T10:42:02.450569",
+  "title": "Wastewater reuse practices",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Wastewater reuse practices"
+    },
+    {
+      "role": "assistant",
+      "content": "**Overview:** Wastewater reuse is widely practiced globally, particularly in agriculture, with significant scale in developing regions where untreated or partially treated wastewater irrigates millions of hectares, far exceeding treated wastewater use[Source 1].\n\n**Key Points:**\n• Untreated or partially treated wastewater irrigates up to 35 million hectares globally, primarily in the global South [Source 1].\n\n• Treated wastewater reuse occurs at a scale thirty times smaller than untreated wastewater irrigation [Source 1].\n\n• The Middle East and North Africa region has documented cases of water reuse for urban landscaping, golf courses, and public irrigation perimeters [Source 4].\n\n• Guidelines exist to improve acceptance and governance of agricultural water reuse, addressing obstacles and best practices [Source 5].\n\n**Implications:**\n• Policies must prioritize safe reuse frameworks to mitigate health risks from untreated wastewater irrigation [Source 1].\n• Scaling treated wastewater reuse requires investment in treatment infrastructure and harmonized governance [Source 5].\n\n| **Practice** | **Scale (Hectares)** | **Region** |\n|--------------|----------------------|------------|\n| Untreated/partially treated wastewater irrigation | ~35 million | Global South |\n| Treated wastewater irrigation | ~1.17 million | Global |\n\nWhat specific aspect of wastewater reuse are you most interested in, such as agricultural applications, treatment technologies, or regional case studies?",
+      "references": [
+        {
+          "content": "Reuse of raw or diluted wastewater for irrigation of ﬁeld crops is practiced around most cities of the global South on a total area of up to 35 million hectares (Raschid-Sally and Jayakody, 2008; Thebo et al., 2017). Most of this irrigation is using untreated or at best partially treated wastewater, at a thirty times larger scale than the known areas using treated wastewater (Scott et al., 2010); Thebo et al., 2017.",
+          "metadata": {
+            "source": "Drechsel-2018-Corporate_social_responsibility_CSR_as_driver_of_change-Business_Model_22.pdf",
+            "page": 2,
+            "type": "paragraph"
+          },
+          "source": "Drechsel-2018-Corporate_social_responsibility_CSR_as_driver_of_change-Business_Model_22.pdf",
+          "page": 2,
+          "type": "paragraph"
+        },
+        {
+          "content": "Navarro, I., Chavez, A., Barrios, J.A., Maya, C., Becerril, E., Lucario, S. and Jiménez, B. 2015. Wastewater reuse for irrigation  Practices, safe reuse and perspectives. In: Javaid, M.S. (ed) Irrigation and drainage  Sustainable strategies and systems. Rijeka, Croatia: InTech Publishing, pp. 3354. www.intechopen.com/books/irrigation-and-drainage-sustainable-strategies-and- systems/wastewater-reuse-for-irrigation-practices-safe-reuse-and-perspectives (accessed 6 Nov. 2017). Tortajada, C. 2006. Water management in Mexico City metropolitan area. Water Resources Development 22 (2): 353376. Water 21. 2012. Reuse solution for the valley of Mexicos water challenges. Magazine of the International Water Association.",
+          "metadata": {
+            "source": "Drechsel-2018-Wastewater_for_agriculture_forestry_and_aquaculture-Section_IV.pdf",
+            "page": 163,
+            "type": "paragraph",
+            "chunk_index": 0,
+            "total_chunks": 1
+          },
+          "source": "Drechsel-2018-Wastewater_for_agriculture_forestry_and_aquaculture-Section_IV.pdf",
+          "page": 163,
+          "type": "paragraph"
+        },
+        {
+          "content": "Abdel-Dayem, S.; Taha, F.; Choukr-Allah, R.; Kfouri, C.; Chung, C.; Al Saiid, A. 2011. Water reuse in the Arab World  From principle to practice. Proceedings of the Expert Consultation Wastewater Management in the Arab World, May 22-24, 2011, Dubai, United Arab Emirates (UAE). World Bank. 40p. https://documents1.worldbank.org/curated/en/405461468136207446/pdf/717450WP0Box- 3700Principle00Practice.pdf Al Awadhi, M. 2014. Beneficial re-use of treated sewage effluent. Presentation by Director of Sewage Treatment Plant Department, Dubai Municipality. FCSC (Federal Competitiveness and Statistics Center). 2021. Annual statistics report. Abu Dhabi, United Arab Emirates (UAE). United Arab Emirates Ministry of Cabinet Affairs.",
+          "metadata": {
+            "source": "Mateo-Sagasta-2022-Water_reuse_in_the_Middle_East_and_North_Africa_a_sourcebook.pdf",
+            "page": 294,
+            "type": "paragraph",
+            "chunk_index": 0,
+            "total_chunks": 1
+          },
+          "source": "Mateo-Sagasta-2022-Water_reuse_in_the_Middle_East_and_North_Africa_a_sourcebook.pdf",
+          "page": 294,
+          "type": "paragraph"
+        },
+        {
+          "content": "Chapter 8 Guidelines to improve acceptance of water reuse 142 Javier Mateo-Sagasta and Pay Drechsel Chapter 9 Toward a more harmonious planning and governance of agricultural water reuse: Guidelines, practices and obstacles 156 Marie-Hélène Nassif and Mohamed Tawfik SECTION 3: A SELECTION OF OUTSTANDING WATER REUSE CASES IN MENA Case Study 1: Morocco Marrakech wastewater treatment plant and urban landscaping 176 Brahim Soudi and Adil Daoudi Case Study 2: Morocco Boukhalef wastewater treatment plant and Tangier green space and golf course water reuse 189 Brahim Soudi, Thomas Fer and Imane El Hatimi Case Study 3: Tunisia Sfax Sud wastewater treatment plant and El Hajeb public irrigated perimeter 200 Chokri Saffar and Ibticem Chamtouri",
+          "metadata": {
+            "source": "Mateo-Sagasta-2022-Water_reuse_in_the_Middle_East_and_North_Africa_a_sourcebook.pdf",
+            "page": 6,
+            "type": "paragraph",
+            "chunk_index": 0,
+            "total_chunks": 1
+          },
+          "source": "Mateo-Sagasta-2022-Water_reuse_in_the_Middle_East_and_North_Africa_a_sourcebook.pdf",
+          "page": 6,
+          "type": "paragraph"
+        },
+        {
+          "content": "Bahri, A. 2008. Water reuse in Middle Eastern and North African countries. In: Water reuse: An international survey of current practice, issues and needs. Jimenez, B. and Asano, T. (eds). ISBN: 9781843390893. London, UK: IWA Publishing. Scientiﬁc and Technical Report. No. 20. pp. 2747. Choukr-Allah, R. and Hamdy, A. 2005 Best management practices for sustainable reuse of treated wastewater. In: Hamdy A. et al. (eds.), Non-conventional water use: WASAMED project. Bari: CIHEAM / EU DG Research, pp. 191200 (Options Méditerranéennes: Série B. Etudes et Recherches; n. 53).",
+          "metadata": {
+            "source": "Drechsel-2018-Wastewater_for_agriculture_forestry_and_aquaculture-Section_IV.pdf",
+            "page": 47,
+            "type": "paragraph"
+          },
+          "source": "Drechsel-2018-Wastewater_for_agriculture_forestry_and_aquaculture-Section_IV.pdf",
+          "page": 47,
+          "type": "paragraph"
+        }
+      ],
+      "msg_id": "msg-1"
+    }
+  ],
+  "total_queries": 1,
+  "model": "DeepSeek"
+}

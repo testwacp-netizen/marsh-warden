@@ -1,0 +1,74 @@
+# Environment variables and secrets
+.env
+.env.*
+.env.local
+.env.production
+secrets.toml
+*.toml
+.streamlit/secrets.toml
+
+# Streamlit authentication tokens
+.streamlit_auth_tokens_*.json
+.streamlit_auth_tokens*.json
+
+# Streamlit cache and config
+.streamlit/
+*.streamlit/
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+virtualenv/
+
+
+
+# Logs
+*.log
+logs/
+*.out
+
+# Dev container settings
+.devcontainer/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.bak
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Specific files you want to ignore
+hyperlink_and_chunker_changed_rag_pipeline.py
+hyperlink_and_chunker_changed_streamlit_app.py
+evaluation/
+water_copilot_md/
+SYSTEM_AND_DEVELOPMENT_SPEC.md
+
+# Build and distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+.streamlit_auth_tokens_*.json 
+.env 
+secrets.toml 
+.streamlit/ 
