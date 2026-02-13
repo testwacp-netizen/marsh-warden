@@ -16,27 +16,12 @@ import logging
 from cbe_agent import RAGPipeline
 import google.generativeai as genai
 from google_auth import check_google_auth
-from token_manager import get_token_rotator, HFTokenRotator
 
-# Remove the old HF_TOKEN line and replace with:
-# Initialize token rotator
-try:
-    token_rotator = get_token_rotator()
-    # Get first token
-    _, HF_TOKEN = token_rotator.get_next_token()
-except Exception as e:
-    st.error(f"🚨 Failed to initialize token rotator: {e}")
-    st.stop()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # ------------------- CONFIG -------------------
 INDEX_FILE = ["pdf_index_enhanced1.pkl", "pdf_index_enhanced2.pkl", "pdf_index_enhanced3.pkl"]
-
-# Access secrets with UPPERCASE keys (matching secrets.toml)
-HF_TOKEN = st.secrets["HF_TOKEN"]    # ✅ Fixed - was lowercase
-DEEPSEEK_API_URL = "https://router.huggingface.co/v1/chat/completions"
-DEEPSEEK_MODEL_NAME = "deepseek-ai/DeepSeek-V3.1:novita"
 
 CHAT_HISTORY_DIR = "chat_histories"
 
@@ -842,7 +827,7 @@ def main():
 
     # Check for secrets first to avoid crashing with a KeyError
     # Use the exact secret names as defined in secrets.toml
-    required_secrets = ["HF_TOKEN", "client_id", "client_secret", "redirect_uri", "GOOGLE_API_KEY"]
+    required_secrets = ["GOOGLE_API_KEY"]
     missing_secrets = [secret for secret in required_secrets if secret not in st.secrets]
     
     if missing_secrets:
@@ -850,11 +835,6 @@ def main():
         st.warning("Please go to your app settings on Streamlit Cloud and add the missing secrets.")
         st.info("You can copy the template from the `secrets.toml` file in the repository and fill in your values.")
         st.stop()
-    
-    # Now safely access the secrets (they've been verified to exist)
-    HF_TOKEN = st.secrets["HF_TOKEN"]
-    # Store it in session state or a global variable for later use
-    st.session_state.HF_TOKEN = HF_TOKEN
     
     # 🔐 AUTHENTICATION CHECK
     if not check_google_auth():
@@ -1025,7 +1005,7 @@ def main():
         
         # Model Selection - without section box
         st.markdown('<div class="section-content">', unsafe_allow_html=True)
-        st.session_state.model = "DeepSeek"
+        st.session_state.model = "Gemini"
         
         st.markdown('</div>', unsafe_allow_html=True)
         
@@ -2317,24 +2297,17 @@ def get_user_initial(name: str) -> str:
 def transcribe_audio(audio_bytes):
     if not audio_bytes:
         return None
-        
-    API_URL = "https://router.huggingface.co/hf-inference/models/openai/whisper-large-v3"
-    headers = {
-        "Authorization": f"Bearer {HF_TOKEN}",
-        "Content-Type": "audio/wav" 
-    }
     
     try:
-        response = requests.post(API_URL, headers=headers, data=audio_bytes)
-        
-        if response.status_code == 200:
-            result = response.json()
-            return result.get("text", "").strip()
-        else:
-            st.error(f"Transcription failed: {response.status_code} - {response.text}")
-            return None
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content([
+            "Please transcribe the following audio into text. Return only the transcription.",
+            {"mime_type": "audio/wav", "data": audio_bytes}
+        ])
+        return response.text.strip()
     except Exception as e:
-        st.error(f"Error connecting to transcription service: {e}")
+        logger.error(f"Gemini transcription failed: {e}")
+        st.error(f"Transcription failed: {e}")
         return None
 
 def clean_text_for_pdf(text):

@@ -19,8 +19,8 @@ TOKEN_STORAGE_FILE = ".streamlit_auth_tokens.json"
 
 class GoogleOAuth:
     def __init__(self):
-        self.client_id = st.secrets["client_id"]
-        self.client_secret = st.secrets["client_secret"]
+        self.client_id = st.secrets.get("client_id")
+        self.client_secret = st.secrets.get("client_secret")
         self.redirect_uri = st.secrets.get("redirect_uri", "http://localhost:8501/")
         
         self.scope = (
@@ -271,6 +271,12 @@ def logout():
 
 def check_google_auth():
     """Check if user is authenticated with Google - with persistent storage"""
+    # If secrets are missing, bypass auth (developer mode or direct access)
+    if "client_id" not in st.secrets or "client_secret" not in st.secrets:
+        st.session_state.google_authenticated = True
+        st.session_state.google_user = {"name": "Admin", "email": "admin@local", "picture": ""}
+        return True
+
     google_oauth = GoogleOAuth()
     params = st.query_params
 
