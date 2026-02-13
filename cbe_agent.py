@@ -6,14 +6,23 @@ import numpy as np
 import pandas as pd
 from typing import List, Dict, Tuple
 from sentence_transformers import SentenceTransformer
-from openai import AzureOpenAI
+import google.generativeai as genai
 import logging
 import requests
 from langchain_community.vectorstores import FAISS
 from langchain_community.retrievers import BM25Retriever
-from langchain.retrievers import EnsembleRetriever
+try:
+    from langchain.retrievers import EnsembleRetriever
+except ImportError:
+    try:
+        from langchain_community.retrievers import EnsembleRetriever
+    except ImportError:
+        from langchain_classic.retrievers import EnsembleRetriever
 from langchain_core.documents import Document
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+try:
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
+except ImportError:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
 import tiktoken
 
 logging.basicConfig(level=logging.INFO)
@@ -33,8 +42,8 @@ class RelevanceChecker:
     def __init__(
         self,
         embedding_model: SentenceTransformer,
-        cross_encoder_name: Optional[str] = "cross-encoder/ms-marco-MiniLM-L-6-v2",
-        threshold: float = 0.70,
+        cross_encoder_name: Optional[str] = "cross-encoder/ms-marco-MiniLM-L-12-v2",
+        threshold: float = 0.60,
         min_docs: int = 2,
         max_docs: int = 6,
         enable_compression: bool = True,
@@ -427,8 +436,8 @@ class RAGPipeline:
         
         self.relevance_checker = RelevanceChecker(
             embedding_model=self.embedding_model,
-            cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-6-v2",
-            threshold=0.65,
+            cross_encoder_name="cross-encoder/ms-marco-MiniLM-L-12-v2",
+            threshold=0.60,
             min_docs=2,
             max_docs=6,
             enable_compression=False,
@@ -450,7 +459,41 @@ class RAGPipeline:
         self.faiss_retriever = None
         self.bm25_retriever = None
         self.hybrid_retriever = None
+
+        # Configure Gemini for query expansion if possible
+        api_key = model_params.get("google_api_key") or os.environ.get("GOOGLE_API_KEY")
+        if api_key:
+            genai.configure(api_key=api_key)
     
+    def expand_query(self, question: str) -> List[str]:
+        """Use Gemini to generate search variations of the query."""
+        try:
+            model = genai.GenerativeModel("gemini-1.5-flash")
+            prompt = f"Generate 3 different search queries to help answer this question: {question}. Return only the queries, one per line."
+            response = model.generate_content(prompt)
+            queries = [q.strip() for q in response.text.split('\n') if q.strip() and len(q.strip()) > 5]
+            if question not in queries:
+                queries.insert(0, question)
+            logger.info(f"Expanded queries: {queries}")
+            return queries
+        except Exception as e:
+            logger.warning(f"Query expansion failed: {e}")
+            return [question]
+
+    def _reciprocal_rank_fusion(self, results_list: List[List[Document]], k=60):
+        """Combine multiple retrieval results using Reciprocal Rank Fusion."""
+        fused_scores = {}
+        for results in results_list:
+            for rank, doc in enumerate(results):
+                # Use a combination of content and source as key
+                doc_id = (doc.page_content, doc.metadata.get("source", ""), doc.metadata.get("page", ""))
+                if doc_id not in fused_scores:
+                    fused_scores[doc_id] = {"score": 0.0, "doc": doc}
+                fused_scores[doc_id]["score"] += 1.0 / (rank + k)
+
+        sorted_results = sorted(fused_scores.values(), key=lambda x: x["score"], reverse=True)
+        return [item["doc"] for item in sorted_results]
+
     def build_index(self, progress_callback=None, status_callback=None):
         """Build index from PDFs in folder"""
         pdf_files = [f for f in os.listdir(self.pdf_folder) if f.lower().endswith(".pdf")]
@@ -642,19 +685,27 @@ class RAGPipeline:
                 logger.error(f"Failed to load index: {e}")
                 return False
     
-    def retrieve_documents(self, question: str, top_k: int = 8) -> Dict:
+    def retrieve_documents(self, question: str, top_k: int = 10) -> Dict:
         """
-        Tool function: Retrieve relevant documents for a question.
-        Returns a dictionary with documents and metadata.
+        Enhanced Tool function: Retrieve relevant documents using query expansion and RRF.
         """
         if self.hybrid_retriever is None:
             raise ValueError("Index not loaded. Call load_index() or build_index() first.")
         
         try:
-            # Retrieve documents
-            retrieved_docs = self.hybrid_retriever.invoke(question)
+            # 1. Query Expansion
+            queries = self.expand_query(question)
+
+            # 2. Multi-query Retrieval
+            all_results = []
+            for q in queries:
+                retrieved = self.hybrid_retriever.invoke(q)
+                all_results.append(retrieved)
+
+            # 3. Reciprocal Rank Fusion
+            fused_docs = self._reciprocal_rank_fusion(all_results)
             
-            if not retrieved_docs:
+            if not fused_docs:
                 return {
                     "success": False,
                     "message": "No relevant documents found.",
@@ -662,9 +713,11 @@ class RAGPipeline:
                     "count": 0
                 }
             
-            top_docs = retrieved_docs[:top_k]
-            filtered = self.relevance_checker.filter_documents(question, top_docs)
-            filtered_docs = [d for d, s in filtered]
+            # 4. Re-ranking and Filtering
+            # We take more for re-ranking to improve precision
+            top_fused = fused_docs[:20]
+            filtered = self.relevance_checker.filter_documents(question, top_fused)
+            filtered_docs = [d for d, s in filtered[:top_k]]
             
             # Format documents for return
             formatted_docs = []
@@ -677,7 +730,7 @@ class RAGPipeline:
                     "type": doc.metadata.get("type", "text")
                 })
             
-            logger.info(f"Retrieved {len(formatted_docs)} relevant documents for question: {question[:100]}")
+            logger.info(f"Retrieved {len(formatted_docs)} accurately ranked documents.")
             
             return {
                 "success": True,

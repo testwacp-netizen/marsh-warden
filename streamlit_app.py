@@ -14,6 +14,7 @@ import logging
 
 # Import RAG pipeline
 from cbe_agent import RAGPipeline
+import google.generativeai as genai
 from google_auth import check_google_auth
 from token_manager import get_token_rotator, HFTokenRotator
 
@@ -60,7 +61,7 @@ def init_session_state():
     if "total_queries" not in st.session_state:
         st.session_state.total_queries = 0
     if "model" not in st.session_state:
-        st.session_state.model = "DeepSeek"
+        st.session_state.model = "Gemini"
     if "rag_loaded" not in st.session_state:
         st.session_state.rag_loaded = False
     if "is_switching" not in st.session_state:
@@ -841,7 +842,7 @@ def main():
 
     # Check for secrets first to avoid crashing with a KeyError
     # Use the exact secret names as defined in secrets.toml
-    required_secrets = ["HF_TOKEN", "client_id", "client_secret", "redirect_uri"]
+    required_secrets = ["HF_TOKEN", "client_id", "client_secret", "redirect_uri", "GOOGLE_API_KEY"]
     missing_secrets = [secret for secret in required_secrets if secret not in st.secrets]
     
     if missing_secrets:
@@ -1774,7 +1775,7 @@ def main():
                     conversation_history=conv_history,
                     rag_pipeline=rag,
                     llm_client=llm_client,
-                    llm_type="deepseek",
+                    llm_type="gemini",
                     model_deployment=None
                 )
                 
@@ -1870,10 +1871,9 @@ def execute_tool(tool_name: str, tool_args: dict, rag_pipeline) -> dict:
 
 def run_agent_loop(user_question: str, conversation_history: list, rag_pipeline, llm_client, llm_type: str, model_deployment: str = None) -> tuple:
     """
-    Run agent loop with tool calling.
+    Run agent loop with Gemini tool calling.
     Returns: (final_answer, retrieved_documents, loop_count)
     """
-    tools = get_tool_definitions()
     
     system_prompt = """You are the Marsh Warden - an AI-powered expert specialized in wetland conservation, environmental policy analysis, and sustainable ecosystem management for Sri Lanka.
 
@@ -1928,110 +1928,76 @@ OUTPUT REQUIREMENTS:
 - Be thorough while maintaining clarity
 - Provide actionable, detailed guidance
 
-Your goal: Provide accurate, hierarchical, citation-backed environmental policy guidance with comprehensive detail for practical compliance and conservation action."
-- Never fabricate or assume content not in your documents
-
-OUTPUT REQUIREMENTS:
-- Deliver comprehensive answers: 300-400 words
-- Use appropriate formatting (tables, bullets, paragraphs) based on content
-- Be thorough while maintaining clarity
-- Provide actionable, detailed guidance
-
 Your goal: Provide accurate, hierarchical, citation-backed environmental policy guidance with comprehensive detail for practical compliance and conservation action."""
 
-    messages = [{"role": "system", "content": system_prompt}]
+    # Define tools for Gemini
+    def retrieve_documents(question: str):
+        """
+        Retrieve relevant documents from the wetland conservation knowledge base.
+
+        Args:
+            question: The user's question or search query.
+        """
+        return rag_pipeline.retrieve_documents(question)
+
+    # Transform conversation history for Gemini
+    history = []
+    for msg in conversation_history:
+        role = "user" if msg["role"] == "user" else "model"
+        history.append({"role": role, "parts": [msg["content"]]})
+
+    # Initialize Gemini model with tools
+    model = genai.GenerativeModel(
+        model_name="gemini-2.0-flash-lite-preview-02-05",
+        tools=[retrieve_documents],
+        system_instruction=system_prompt
+    )
     
-    # Add conversation history
-    if conversation_history:
-        messages.extend(conversation_history)
-    
-    # Add current user question
-    messages.append({"role": "user", "content": user_question})
-    
+    chat = model.start_chat(history=history)
     all_retrieved_docs = []
     loop_count = 0
     
-    for iteration in range(MAX_AGENT_LOOPS):
+    try:
+        # Send initial message
+        response = chat.send_message(user_question)
         loop_count += 1
-        logger.info(f"Agent loop iteration {loop_count}/{MAX_AGENT_LOOPS}")
         
-        try:
-            headers = {
-                "Authorization": f"Bearer {HF_TOKEN}",
-                "Content-Type": "application/json"
-            }
-            payload = {
-                "model": DEEPSEEK_MODEL_NAME,
-                "messages": messages,
-                "tools": tools,
-                "tool_choice": "auto",
-                "max_tokens": 8000,
-                "temperature": 0.1
-            }
-
-            r = requests.post(DEEPSEEK_API_URL, headers=headers, json=payload, timeout=120)
-
-            if r.status_code != 200:
-                logger.error(f"DeepSeek API error: {r.status_code} - {r.text}")
-                return f"Sorry, model error: {r.status_code}", [], loop_count
-
-            data = r.json()
-            response_message = data["choices"][0]["message"]
-            finish_reason = data["choices"][0]["finish_reason"]
+        # Agent loop: handle tool calls
+        while loop_count < MAX_AGENT_LOOPS:
+            # Check if there are any function calls in the last response
+            function_calls = [part.function_call for part in response.candidates[0].content.parts if part.function_call]
             
-            # Check if tool calls are needed
-            tool_calls = getattr(response_message, 'tool_calls', None) or response_message.get('tool_calls')
-            
-            if not tool_calls or finish_reason == "stop":
-                # No more tool calls, return final answer
-                final_content = response_message.content if hasattr(response_message, 'content') else response_message.get('content', '')
-                logger.info(f"Agent completed in {loop_count} iterations")
-                return final_content, all_retrieved_docs, loop_count
-            
-            # Add assistant message with tool calls to history
-            messages.append({
-                "role": "assistant",
-                "content": response_message.content if hasattr(response_message, 'content') else response_message.get('content'),
-                "tool_calls": tool_calls if isinstance(tool_calls, list) else [tc.__dict__ if hasattr(tc, '__dict__') else tc for tc in tool_calls]
-            })
-            
-            # Execute each tool call
-            for tool_call in tool_calls:
-                if hasattr(tool_call, 'function'):
-                    function_name = tool_call.function.name
-                    function_args = json.loads(tool_call.function.arguments)
-                    tool_call_id = tool_call.id
-                else:
-                    function_name = tool_call['function']['name']
-                    function_args = json.loads(tool_call['function']['arguments'])
-                    tool_call_id = tool_call['id']
+            if not function_calls:
+                break
                 
-                logger.info(f"Executing tool: {function_name} with args: {function_args}")
+            tool_responses = []
+            for fc in function_calls:
+                logger.info(f"Gemini calling tool: {fc.name} with args: {fc.args}")
                 
                 # Execute tool
-                tool_result = execute_tool(function_name, function_args, rag_pipeline)
+                result = retrieve_documents(**fc.args)
                 
-                # Collect retrieved documents
-                if tool_result.get("success") and tool_result.get("documents"):
-                    all_retrieved_docs.extend(tool_result["documents"])
+                # Collect retrieved documents for citations
+                if result.get("success") and result.get("documents"):
+                    all_retrieved_docs.extend(result["documents"])
                 
-                # Format tool result for LLM
-                tool_response_content = json.dumps(tool_result)
-                
-                # Add tool response to messages
-                messages.append({
-                    "role": "tool",
-                    "tool_call_id": tool_call_id,
-                    "content": tool_response_content
-                })
+                # Format response for Gemini
+                tool_responses.append(genai.protos.Part(
+                    function_response=genai.protos.FunctionResponse(
+                        name=fc.name,
+                        response={"result": json.dumps(result)}
+                    )
+                ))
             
-        except Exception as e:
-            logger.error(f"Agent loop error: {e}")
-            return f"Sorry, I encountered an error: {str(e)}", all_retrieved_docs, loop_count
-    
-    # Max iterations reached
-    logger.warning(f"Agent reached max iterations ({MAX_AGENT_LOOPS})")
-    return "I apologize, but I need more time to process your request. Please try rephrasing your question.", all_retrieved_docs, loop_count
+            # Send tool results back to Gemini
+            response = chat.send_message(tool_responses)
+            loop_count += 1
+
+        return response.text, all_retrieved_docs, loop_count
+
+    except Exception as e:
+        logger.error(f"Gemini agent loop error: {e}")
+        return f"I encountered an error while processing your request: {str(e)}", all_retrieved_docs, loop_count
 
 # =============== CHAT HISTORY MANAGEMENT ===============
 
@@ -2460,10 +2426,8 @@ def export_conversation_pdf():
 @st.cache_resource(show_spinner=False)
 def get_rag_pipeline(selected_model: str):
     params = {
-        "llm_type": "deepseek",
-        "hf_token": HF_TOKEN,
-        "deepseek_url": DEEPSEEK_API_URL,
-        "deepseek_model": DEEPSEEK_MODEL_NAME,
+        "llm_type": "gemini",
+        "google_api_key": st.secrets["GOOGLE_API_KEY"],
     }
     return RAGPipeline(
         pdf_folder="",  # Not needed for runtime, only for building the index
@@ -2474,6 +2438,9 @@ def get_rag_pipeline(selected_model: str):
 @st.cache_resource(show_spinner=False)
 def get_llm_client(selected_model: str):
     """Get LLM client for agent loop"""
+    if "GOOGLE_API_KEY" in st.secrets:
+        genai.configure(api_key=st.secrets["GOOGLE_API_KEY"])
+        return genai.GenerativeModel("gemini-2.0-flash-lite-preview-02-05")
     return None
 if __name__ == "__main__":
     main()
